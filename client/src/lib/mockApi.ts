@@ -295,7 +295,17 @@ class MockApi {
 
   async getProject(id: string): Promise<Project | null> {
     const projects = this.getFromStorage<Project[]>('projects', []);
-    return projects.find(p => p.id === id) || null;
+    const project = projects.find(p => p.id === id);
+    
+    if (project) {
+      // Check if demo data exists for this project, if not initialize it
+      const runs = this.getFromStorage<Run[]>(`runs_${id}`, []);
+      if (runs.length === 0) {
+        await this.initializeDemoData(id);
+      }
+    }
+    
+    return project || null;
   }
 
   // Pages

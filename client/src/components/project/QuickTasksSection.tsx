@@ -27,6 +27,7 @@ export function QuickTasksSection() {
     hubs: {
       enabled: true,
       config: {
+        prefix: '',
         topology: 'star',
         restrictPrefix: true,
       }
@@ -137,6 +138,14 @@ export function QuickTasksSection() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
             <div>
+              <Label className="block text-xs text-slate-600 mb-1">Prefix</Label>
+              <Input 
+                value={tasks.hubs.config.prefix}
+                onChange={(e) => updateTaskConfig('hubs', 'prefix', e.target.value)}
+                placeholder="/catalog/"
+              />
+            </div>
+            <div>
               <Label className="block text-xs text-slate-600 mb-1">Topology</Label>
               <Select 
                 value={tasks.hubs.config.topology}
@@ -152,13 +161,13 @@ export function QuickTasksSection() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="md:col-span-2">
+            <div>
               <label className="flex items-center text-xs">
                 <Checkbox 
                   checked={tasks.hubs.config.restrictPrefix}
                   onCheckedChange={(checked) => updateTaskConfig('hubs', 'restrictPrefix', !!checked)}
                 />
-                <span className="ml-2">Restrict strictly within (sub)prefix</span>
+                <span className="ml-2">Restrict within prefix</span>
               </label>
             </div>
           </div>

@@ -57,10 +57,31 @@ export function CSVImportSection({ projectId }: CSVImportSectionProps) {
       const csv = e.target?.result as string;
       
       if (!window.Papa) {
-        toast({
-          title: "Error",
-          description: "CSV parser not loaded. Please refresh the page.",
-          variant: "destructive",
+        // Fallback to simple CSV parsing if Papa Parse isn't available
+        const lines = csv.split('\n');
+        const headers = lines[0].split(',').map(h => h.trim());
+        const rows = lines.slice(1).map(line => line.split(',').map(cell => cell.trim()));
+        
+        const parsedData = rows.map(row => {
+          const obj: any = {};
+          headers.forEach((header, index) => {
+            obj[header] = row[index] || '';
+          });
+          return obj;
+        }).filter(row => Object.values(row).some(val => val));
+
+        const initialMapping: Record<string, string> = {};
+        headers.forEach(header => {
+          const lowerHeader = header.toLowerCase();
+          if (lowerHeader.includes('url')) initialMapping.url = header;
+          else if (lowerHeader.includes('title')) initialMapping.title = header;
+          else if (lowerHeader.includes('content') || lowerHeader.includes('text') || lowerHeader.includes('html')) initialMapping.html_or_text = header;
+        });
+
+        setCsvData({
+          headers,
+          rows: parsedData,
+          mapping: initialMapping
         });
         return;
       }

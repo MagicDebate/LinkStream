@@ -1,0 +1,88 @@
+патч под “frontend-only”)
+Внеси изменения в уже сгенерированный фронтенд:
+
+Новые роуты
+
+Добавь /project/:id (Dashboard), /project/:id/new (Run Workspace), /project/:id/history (Run History).
+
+Оставь /project/:id/import как страницу импорта CSV (переход с дашборда).
+
+Dashboard компоненты (compact)
+
+ProjectHeader: название, домен, кнопки: «Новое обогащение», «Импорт CSV», «История».
+
+LastRunCard: статус, дата, задачи (чипы), counters (added/rejected), кнопка «Продолжить ревью» если Draft.
+
+KPIGrid (4–6 тайлов): Orphans, Avg Depth, Links Added, 404 Fixed, Anchor Profile. Каждый показывает Δ от предпредыдущего run.
+
+DataSourceCard: имя CSV, строки, дата импорта, «Переимпортировать».
+
+Run Workspace (один экран, без попапов)
+
+Глобальные параметры наверху (Max N, порядок приоритетов drag&drop, minGap, exact%, stop-anchors, Old links, Broken, HTML attrs, Scope).
+
+Быстрые задачи — чекбоксы с мини-полями:
+
+Хабы по префиксу: загрузка CSV prefix, subprefix?, hub_url, топология (звезда/кольцо/колесо), «ограничить внутри (под)префикса».
+
+Money: паттерн URL (regex).
+
+Похожие: префикс(ы), k=1..3.
+
+Глубинные: minDepth, доноры ≤3.
+
+Свежие: daysFresh, linksPerDonor.
+
+Сироты: область (сайт/префикс).
+
+Чистка 404: политика Delete/Replace/Ignore.
+
+Перегенерация/обогащение: Enrich/Regenerate.
+
+Preflight строкой: «Ожидаем ≈ X ссылок (Хаб ~A, Коммерция ~B, …)».
+
+Кнопка “Запустить” → прогресс (эмуляция фаз) → статус Draft → сразу ниже Draft Review.
+
+Draft Review таблица inline (фильтры по типам, чекбоксы «Одобрено», inline-diff). Кнопки «Одобрить видимые», «Экспорт CSV», «Применить».
+
+Run History страница
+
+Таблица: дата/время, статус, задачи (чипы), counts (added/rejected), длительность.
+
+Фильтры по статусу. Клик по строке → открывает соответствующий Draft/Result (тот же компонент, в read-only, в этой странице).
+
+Mock слой (localStorage)
+
+Расширь mockApi:
+
+projects теперь содержит runs[].
+
+createRun(projectId, params) создаёт run со статусом running; «фазы» двигаются через setInterval.
+
+По завершении — draft + link_candidates[].
+
+publishRun(runId) → статус published.
+
+getLastRun(projectId), getKpiComparison(projectId) для Δ метрик.
+
+Перемести то, что раньше было «в одном экране проекта», в Run Workspace.
+
+Header & Footer
+
+Header: лого слева; справа аватар → меню: «Настройки» (панель смены пароля прямо на текущей странице), «Выход».
+
+Footer: компактный, sticky: © Название · v0.x · «Документация».
+
+Компактность UI
+
+Tailwind text-sm, плотные таблицы, без модалок; аккордеоны для секций; sticky-якоря «Запуск/Прогресс» и «Черновик».
+
+Acceptance
+
+/projects → /project/:id (Dashboard) с последним запуском и KPI.
+
+«Новое обогащение» ведёт в /project/:id/new (Workspace) с задачами-галочками и общей кнопкой «Запустить».
+
+Генерация эмулируется, черновик/применение/экспорт CSV работают в рамках mock.
+
+/project/:id/history отражает все run’ы и открывает их детали.

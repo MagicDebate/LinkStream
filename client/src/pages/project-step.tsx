@@ -18,8 +18,8 @@ import { RunHistorySection } from '@/components/project/RunHistorySection';
 
 const STEPS = [
   { id: 'csv-import', component: CSVImportSection, titleKey: 'csvImport' as const },
-  { id: 'global-parameters', component: GlobalParametersSection, titleKey: 'globalParameters' as const },
   { id: 'quick-tasks', component: QuickTasksSection, titleKey: 'quickTasks' as const },
+  { id: 'global-parameters', component: GlobalParametersSection, titleKey: 'globalParameters' as const },
   { id: 'launch-progress', component: LaunchProgressSection, titleKey: 'launchProgress' as const },
   { id: 'draft-review', component: DraftReviewSection, titleKey: 'draftReview' as const },
   { id: 'run-history', component: RunHistorySection, titleKey: 'runHistory' as const },

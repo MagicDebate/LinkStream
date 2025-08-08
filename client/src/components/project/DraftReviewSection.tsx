@@ -60,7 +60,17 @@ export function DraftReviewSection({ projectId, className }: DraftReviewSectionP
       // Get the most recent run for this project
       const runs = await mockApi.getRuns(projectId);
       if (runs.length === 0) {
-        setCandidates([]);
+        // If no runs exist, create demo data
+        const project = await mockApi.getProject(projectId);
+        if (project) {
+          await mockApi.initializeDemoData(projectId);
+          const newRuns = await mockApi.getRuns(projectId);
+          if (newRuns.length > 0) {
+            const data = await mockApi.getLinkCandidates(newRuns[0].id);
+            setCandidates(data);
+            calculateFilterCounts(data);
+          }
+        }
         return;
       }
 
@@ -70,8 +80,8 @@ export function DraftReviewSection({ projectId, className }: DraftReviewSectionP
       calculateFilterCounts(data);
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to load draft candidates",
+        title: "Ошибка",
+        description: "Не удалось загрузить черновики ссылок",
         variant: "destructive",
       });
     } finally {

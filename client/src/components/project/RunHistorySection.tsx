@@ -33,12 +33,22 @@ export function RunHistorySection({ projectId }: RunHistorySectionProps) {
 
   const loadRuns = async () => {
     try {
-      const data = await mockApi.getRuns(projectId);
+      let data = await mockApi.getRuns(projectId);
+      
+      // If no runs exist, initialize demo data
+      if (data.length === 0) {
+        const project = await mockApi.getProject(projectId);
+        if (project) {
+          await mockApi.initializeDemoData(projectId);
+          data = await mockApi.getRuns(projectId);
+        }
+      }
+      
       setRuns(data);
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to load run history",
+        title: "Ошибка",
+        description: "Не удалось загрузить историю запусков",
         variant: "destructive",
       });
     } finally {
