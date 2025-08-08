@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useTranslation } from '@/hooks/useTranslation';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 export default function LoginPage() {
   const { login, register } = useAuth();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   
@@ -32,13 +34,13 @@ export default function LoginPage() {
     try {
       await login(loginForm.email, loginForm.password);
       toast({
-        title: "Welcome back!",
-        description: "You have been successfully logged in.",
+        title: t('welcomeBack'),
+        description: t('loginSuccess'),
       });
     } catch (error) {
       toast({
-        title: "Login failed",
-        description: error instanceof Error ? error.message : "Invalid credentials",
+        title: t('loginFailed'),
+        description: error instanceof Error ? error.message : t('invalidCredentials'),
         variant: "destructive",
       });
     } finally {
@@ -54,13 +56,13 @@ export default function LoginPage() {
     try {
       await register(registerForm.email, registerForm.password, registerForm.firstName, registerForm.lastName);
       toast({
-        title: "Account created!",
-        description: "Welcome to LinkForge.",
+        title: t('accountCreated'),
+        description: t('welcomeTo'),
       });
     } catch (error) {
       toast({
-        title: "Registration failed",
-        description: error instanceof Error ? error.message : "Failed to create account",
+        title: t('registrationFailed'),
+        description: error instanceof Error ? error.message : "Не удалось создать аккаунт",
         variant: "destructive",
       });
     } finally {

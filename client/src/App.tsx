@@ -5,6 +5,8 @@ import { useAuth } from "@/hooks/useAuth";
 import LoginPage from "@/pages/login";
 import ProjectsPage from "@/pages/projects";
 import ProjectPage from "@/pages/project";
+import ProjectStepPage from "@/pages/project-step";
+import SettingsPage from "@/pages/settings";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,7 +28,9 @@ function Router() {
         <>
           <Route path="/" component={ProjectsPage} />
           <Route path="/projects" component={ProjectsPage} />
+          <Route path="/settings" component={SettingsPage} />
           <Route path="/project/:id" component={ProjectPage} />
+          <Route path="/project/:id/:step" component={ProjectStepPage} />
         </>
       )}
       <Route component={NotFound} />

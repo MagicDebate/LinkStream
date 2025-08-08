@@ -153,7 +153,144 @@ class MockApi {
     projects.push(project);
     this.setToStorage('projects', projects);
     
+    // Initialize with demo data
+    await this.initializeDemoData(project.id);
+    
     return project;
+  }
+
+  async initializeDemoData(projectId: string): Promise<void> {
+    // Create sample pages
+    const samplePages: Page[] = [
+      {
+        id: `page-${projectId}-1`,
+        projectId,
+        url: '/catalog/products',
+        title: 'Каталог товаров',
+        content: 'Большой выбор качественных товаров для дома и офиса.',
+        metaTitle: 'Каталог товаров - Интернет-магазин',
+        metaDescription: 'Широкий ассортимент товаров с доставкой',
+        publishDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        language: 'ru',
+        depth: 2,
+        isOrphan: false,
+        createdAt: new Date(),
+      },
+      {
+        id: `page-${projectId}-2`,
+        projectId,
+        url: '/about',
+        title: 'О компании',
+        content: 'Мы ведущая компания в сфере электронной коммерции.',
+        metaTitle: 'О нашей компании',
+        metaDescription: 'Узнайте больше о нашей истории и ценностях',
+        publishDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        language: 'ru',
+        depth: 1,
+        isOrphan: false,
+        createdAt: new Date(),
+      },
+      {
+        id: `page-${projectId}-3`,
+        projectId,
+        url: '/catalog/electronics/smartphones',
+        title: 'Смартфоны',
+        content: 'Современные смартфоны от ведущих производителей.',
+        metaTitle: 'Смартфоны - Электроника',
+        metaDescription: 'Выбор смартфонов по выгодным ценам',
+        publishDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        language: 'ru',
+        depth: 3,
+        isOrphan: false,
+        createdAt: new Date(),
+      },
+    ];
+    
+    this.setToStorage(`pages_${projectId}`, samplePages);
+    
+    // Create sample runs
+    const sampleRuns: Run[] = [
+      {
+        id: `run-${projectId}-1`,
+        projectId,
+        status: 'completed',
+        config: { tasks: ['hubs', 'similar', 'orphans'], maxLinksPerPage: 3 },
+        stats: { 
+          linksAdded: 45, 
+          rejected: 12, 
+          pagesProcessed: 156,
+          processingTime: 127,
+          orphansReduced: 8,
+          avgDepthReduced: 0.3
+        },
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        completedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 127000),
+      },
+      {
+        id: `run-${projectId}-2`,
+        projectId,
+        status: 'completed',
+        config: { tasks: ['commerce', 'fresh'], maxLinksPerPage: 5 },
+        stats: { 
+          linksAdded: 23, 
+          rejected: 7, 
+          pagesProcessed: 89,
+          processingTime: 83,
+          orphansReduced: 3,
+          avgDepthReduced: 0.1
+        },
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        completedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000 + 83000),
+      },
+    ];
+    
+    this.setToStorage(`runs_${projectId}`, sampleRuns);
+    
+    // Create sample link candidates for the latest run
+    const latestRun = sampleRuns[0];
+    const sampleCandidates: LinkCandidate[] = [
+      {
+        id: `candidate-${latestRun.id}-1`,
+        runId: latestRun.id,
+        sourceUrl: '/catalog/products',
+        targetUrl: '/catalog/electronics/smartphones',
+        anchor: 'смартфоны',
+        type: 'hubs',
+        status: 'approved',
+        rejectionReason: null,
+        beforeText: 'В нашем каталоге представлены различные категории товаров.',
+        afterText: 'В нашем каталоге представлены различные категории товаров, включая смартфоны.',
+        createdAt: latestRun.createdAt,
+      },
+      {
+        id: `candidate-${latestRun.id}-2`,
+        runId: latestRun.id,
+        sourceUrl: '/about',
+        targetUrl: '/catalog/products',
+        anchor: 'каталог товаров',
+        type: 'similar',
+        status: 'pending',
+        rejectionReason: null,
+        beforeText: 'Мы предлагаем широкий ассортимент продукции.',
+        afterText: 'Мы предлагаем широкий каталог товаров высокого качества.',
+        createdAt: latestRun.createdAt,
+      },
+      {
+        id: `candidate-${latestRun.id}-3`,
+        runId: latestRun.id,
+        sourceUrl: '/catalog/electronics/smartphones',
+        targetUrl: '/about',
+        anchor: 'о нашей компании',
+        type: 'orphans',
+        status: 'rejected',
+        rejectionReason: 'stop_anchor',
+        beforeText: 'Узнайте больше информации.',
+        afterText: 'Узнайте больше о нашей компании.',
+        createdAt: latestRun.createdAt,
+      },
+    ];
+    
+    this.setToStorage(`candidates_${latestRun.id}`, sampleCandidates);
   }
 
   async getProject(id: string): Promise<Project | null> {

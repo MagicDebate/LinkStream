@@ -3,6 +3,7 @@ import { Link } from 'wouter';
 import { Plus } from 'lucide-react';
 import { mockApi } from '@/lib/mockApi';
 import { Project } from '@shared/schema';
+import { useTranslation } from '@/hooks/useTranslation';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -20,6 +21,7 @@ export default function ProjectsPage() {
     name: '',
     domain: '',
   });
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -32,8 +34,8 @@ export default function ProjectsPage() {
       setProjects(data);
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to load projects",
+        title: t('error'),
+        description: "Не удалось загрузить проекты",
         variant: "destructive",
       });
     } finally {
