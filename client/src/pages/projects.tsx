@@ -8,6 +8,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { apiClient } from '@/lib/apiClient';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,11 +23,13 @@ export default function ProjectsPage() {
     name: '',
     domain: '',
   });
+  const [apiOnline, setApiOnline] = useState<boolean | null>(null);
   const { t } = useTranslation();
   const { toast } = useToast();
 
   useEffect(() => {
     loadProjects();
+    checkApi();
   }, []);
 
   const loadProjects = async () => {
@@ -40,6 +44,15 @@ export default function ProjectsPage() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const checkApi = async () => {
+    try {
+      const res = await apiClient.getHealth();
+      setApiOnline(!!res.ok);
+    } catch {
+      setApiOnline(false);
     }
   };
 
@@ -73,9 +86,20 @@ export default function ProjectsPage() {
       <Header />
       
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Projects</h1>
-          <p className="text-slate-600">Manage your internal linking projects</p>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">Projects</h1>
+            <p className="text-slate-600">Manage your internal linking projects</p>
+          </div>
+          <div className="flex items-center space-x-2">
+            {apiOnline === null ? (
+              <Badge variant="secondary">Checking API...</Badge>
+            ) : apiOnline ? (
+              <Badge className="bg-emerald-100 text-emerald-800">API online</Badge>
+            ) : (
+              <Badge className="bg-red-100 text-red-800">API offline</Badge>
+            )}
+          </div>
         </div>
 
         {showCreateForm && (

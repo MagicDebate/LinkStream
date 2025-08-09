@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: linkstream
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/10-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: ./server
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@db:5432/linkstream}
+      JWT_SECRET: ${JWT_SECRET:-change_me}
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+      args:
+        - VITE_API_BASE=${VITE_API_BASE:-/api}
+    environment:
+      VITE_API_BASE: ${VITE_API_BASE:-/api}
+    expose:
+      - "3000"
+
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      - frontend
+      - server
+
+volumes:
+  pgdata:
+
+
